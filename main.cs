@@ -1,45 +1,106 @@
-def inserir_valores(categorias):
-    gastos = []
-    for categoria in categorias:
-        valor = float(input(f"Insira o valor gasto em {categoria}: "))
-        gastos.append(valor)
-    return gastos
+using System;
+using System.Collections.Generic;
 
-def total_gastos(gastos):
-    return sum(gastos)
+class ProgramaControleGastos
+{
+    static List<double> InserirValores(List<string> categorias)
+    {
+        var gastos = new List<double>();
+        foreach (var categoria in categorias)
+        {
+            while (true)
+            {
+                try
+                {
+                    Console.Write($"Insira o valor gasto em {categoria}: ");
+                    var valor = double.Parse(Console.ReadLine());
+                    if (valor < 0)
+                    {
+                        throw new ArgumentException("O valor não pode ser negativo.");
+                    }
+                    gastos.Add(valor);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Entrada inválida: {e.Message}. Tente novamente.");
+                }
+            }
+        }
+        return gastos;
+    }
 
-def media_gastos(gastos):
-    return sum(gastos) / len(gastos)
+    static double TotalGastos(List<double> gastos)
+    {
+        double total = 0;
+        foreach (var gasto in gastos)
+        {
+            total += gasto;
+        }
+        return total;
+    }
 
-def maior_gasto(gastos, categorias):
-    maior = max(gastos)
-    categoria = categorias[gastos.index(maior)]
-    return maior, categoria
+    static double MediaGastos(List<double> gastos)
+    {
+        return TotalGastos(gastos) / gastos.Count;
+    }
 
-def menor_gasto(gastos, categorias):
-    menor = min(gastos)
-    categoria = categorias[gastos.index(menor)]
-    return menor, categoria
+    static (double, string) MaiorGasto(List<double> gastos, List<string> categorias)
+    {
+        double maior = double.MinValue;
+        string categoria = "";
+        for (int i = 0; i < gastos.Count; i++)
+        {
+            if (gastos[i] > maior)
+            {
+                maior = gastos[i];
+                categoria = categorias[i];
+            }
+        }
+        return (maior, categoria);
+    }
 
-def exibir_resultados(gastos, categorias):
-    total = total_gastos(gastos)
-    media = media_gastos(gastos)
-    maior, categoria_maior = maior_gasto(gastos, categorias)
-    menor, categoria_menor = menor_gasto(gastos, categorias)
-    
-    print(f"Total de gastos: R$ {total}")
-    print(f"Gasto médio mensal: R$ {media}")
-    print(f"Maior gasto: R$ {maior} em {categoria_maior}")
-    print(f"Menor gasto: R$ {menor} em {categoria_menor}")
+    static (double, string) MenorGasto(List<double> gastos, List<string> categorias)
+    {
+        double menor = double.MaxValue;
+        string categoria = "";
+        for (int i = 0; i < gastos.Count; i++)
+        {
+            if (gastos[i] < menor)
+            {
+                menor = gastos[i];
+                categoria = categorias[i];
+            }
+        }
+        return (menor, categoria);
+    }
 
-def main():
-    categorias = ["Alimentação", "Transporte", "Lazer", "Saúde", "Educação"]
-    while True:
-        gastos = inserir_valores(categorias)
-        exibir_resultados(gastos, categorias)
-        opcao = input("Deseja inserir novos valores? (s/n): ")
-        if opcao.lower() != 's':
-            break
+    static void ExibirResultados(List<double> gastos, List<string> categorias)
+    {
+        double total = TotalGastos(gastos);
+        double media = MediaGastos(gastos);
+        var (maior, categoriaMaior) = MaiorGasto(gastos, categorias);
+        var (menor, categoriaMenor) = MenorGasto(gastos, categorias);
 
-if __name__ == "__main__":
-    main()
+        Console.WriteLine($"Total de gastos: R$ {total:F2}");
+        Console.WriteLine($"Gasto médio mensal: R$ {media:F2}");
+        Console.WriteLine($"Maior gasto: R$ {maior:F2} em {categoriaMaior}");
+        Console.WriteLine($"Menor gasto: R$ {menor:F2} em {categoriaMenor}");
+    }
+
+    static void Main()
+    {
+        var categorias = new List<string> { "Alimentação", "Transporte", "Lazer", "Saúde", "Educação" };
+        while (true)
+        {
+            var gastos = InserirValores(categorias);
+            ExibirResultados(gastos, categorias);
+            Console.Write("Deseja inserir novos valores? (s/n): ");
+            var opcao = Console.ReadLine();
+            if (opcao.ToLower() != "s")
+            {
+                break;
+            }
+        }
+    }
+}
